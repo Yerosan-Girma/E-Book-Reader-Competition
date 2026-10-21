@@ -1,0 +1,72 @@
+<svg width="900" height="900" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">A stack of books with turning pages</title>
+  <desc id="desc">Three richly colored books float above an open book with small illuminated pages.</desc>
+  <defs>
+    <linearGradient id="green" x1="180" y1="190" x2="610" y2="740" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4E9C75"/>
+      <stop offset="1" stop-color="#123F2E"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="220" y1="160" x2="630" y2="680" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F1CF7E"/>
+      <stop offset="1" stop-color="#B9772C"/>
+    </linearGradient>
+    <linearGradient id="plum" x1="210" y1="160" x2="620" y2="660" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A46676"/>
+      <stop offset="1" stop-color="#4C293B"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="200" y1="620" x2="705" y2="790" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF5D7"/>
+      <stop offset="1" stop-color="#CDB276"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0" cy="0" r="1" gradientTransform="translate(462 426) rotate(90) scale(384)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D8AA5B" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#D8AA5B" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="95" y="112" width="740" height="700" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+    <filter id="glow" x="100" y="100" width="740" height="740" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="34"/>
+    </filter>
+  </defs>
+
+  <circle cx="462" cy="426" r="340" fill="url(#halo)"/>
+  <ellipse cx="470" cy="762" rx="290" ry="48" fill="#020C08" fill-opacity="0.8" filter="url(#shadow)"/>
+
+  <!-- soft page fragments add motion without competing with the headline -->
+  <path d="M184 306C230 272 270 276 308 307C267 322 236 343 205 380C185 359 179 334 184 306Z" fill="#F5E5B5" fill-opacity="0.32"/>
+  <path d="M680 216C730 199 760 218 778 259C739 255 714 267 687 289C671 263 668 241 680 216Z" fill="#D8AA5B" fill-opacity="0.35"/>
+  <path d="M722 470C762 453 790 464 813 496C777 495 750 505 721 528C708 507 707 488 722 470Z" fill="#DDE8D9" fill-opacity="0.25"/>
+
+  <!-- rear book -->
+  <g transform="translate(217 233) rotate(-15)">
+    <rect x="0" y="0" width="370" height="255" rx="19" fill="#12291F" fill-opacity="0.66" filter="url(#glow)"/>
+    <path d="M8 14C12 4 22 0 34 0H344C362 0 374 12 374 30V245C374 256 365 264 354 264H26C12 264 2 254 2 240V31C2 24 4 18 8 14Z" fill="url(#plum)" stroke="#F0C77B" stroke-opacity="0.45" stroke-width="4"/>
+    <path d="M43 54H306M43 72H228" stroke="#F8EBC7" stroke-opacity="0.6" stroke-width="6" stroke-linecap="round"/>
+    <path d="M43 204H328" stroke="#F8EBC7" stroke-opacity="0.28" stroke-width="4"/>
+  </g>
+
+  <!-- middle book -->
+  <g transform="translate(246 344) rotate(8)">
+    <path d="M14 11C18 2 28 0 39 0H354C370 0 378 9 378 24V251C378 263 369 271 357 271H27C12 271 4 261 4 246V29C4 22 7 16 14 11Z" fill="url(#green)" stroke="#CDE0B9" stroke-opacity="0.48" stroke-width="4"/>
+    <path d="M45 53H324M45 74H260" stroke="#E7E2B8" stroke-opacity="0.64" stroke-width="6" stroke-linecap="round"/>
+    <path d="M44 215H324" stroke="#DDE8D9" stroke-opacity="0.34" stroke-width="4"/>
+    <rect x="21" y="24" width="12" height="221" rx="5" fill="#0A2D21" fill-opacity="0.6"/>
+  </g>
+
+  <!-- front gold book -->
+  <g transform="translate(187 493) rotate(-7)">
+    <path d="M14 12C18 3 29 0 41 0H398C414 0 423 10 423 25V264C423 276 414 284 402 284H28C12 284 4 273 4 258V31C4 23 7 16 14 12Z" fill="url(#gold)" stroke="#FFF2C9" stroke-opacity="0.72" stroke-width="4"/>
+    <path d="M57 57H342M57 80H269" stroke="#55391C" stroke-opacity="0.62" stroke-width="7" stroke-linecap="round"/>
+    <path d="M56 227H365" stroke="#6C481F" stroke-opacity="0.38" stroke-width="5"/>
+    <rect x="23" y="25" width="14" height="233" rx="5" fill="#9D6627" fill-opacity="0.7"/>
+  </g>
+
+  <!-- open book in front -->
+  <g transform="translate(116 655)">
+    <path d="M0 35C93 0 187 6 304 65L301 181C190 131 99 130 0 165V35Z" fill="url(#paper)"/>
+    <path d="M304 65C404 3 505 4 665 47V168C518 129 408 130 301 181L304 65Z" fill="#E7D59C"/>
+    <path d="M304 65V181" stroke="#98784D" stroke-width="7"/>
+    <path d="M38 54C115 31 189 39 270 79M26 81C117 58 188 65 269 102M341 82C437 36 522 37 624 61M340 109C438 66 533 67 630 90" stroke="#B99B62" stroke-opacity="0.65" stroke-width="6" stroke-linecap="round"/>
+  </g>
+</svg>

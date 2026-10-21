@@ -1,0 +1,128 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">A warm reading nook at dusk</title>
+  <desc id="desc">An open book rests on a wooden table beside a glowing lamp and a tall window in a deep green reading room.</desc>
+  <defs>
+    <linearGradient id="wall" x1="900" y1="0" x2="900" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#123D2E"/>
+      <stop offset="0.58" stop-color="#09281E"/>
+      <stop offset="1" stop-color="#04140E"/>
+    </linearGradient>
+    <linearGradient id="leftShade" x1="0" y1="0" x2="800" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#03130D" stop-opacity="0.78"/>
+      <stop offset="1" stop-color="#03130D" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="750" y1="710" x2="750" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#102F22"/>
+      <stop offset="1" stop-color="#040F0A"/>
+    </linearGradient>
+    <linearGradient id="windowGlass" x1="1110" y1="150" x2="1480" y2="610" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A8D4B2" stop-opacity="0.72"/>
+      <stop offset="0.48" stop-color="#538C70" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#123F30" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient id="tableTop" x1="800" y1="735" x2="1500" y2="870" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7C583A"/>
+      <stop offset="0.48" stop-color="#4B3021"/>
+      <stop offset="1" stop-color="#21160F"/>
+    </linearGradient>
+    <linearGradient id="bookLeft" x1="720" y1="722" x2="964" y2="810" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3E3B9"/>
+      <stop offset="1" stop-color="#CBAF74"/>
+    </linearGradient>
+    <linearGradient id="bookRight" x1="970" y1="790" x2="1200" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D9C18A"/>
+      <stop offset="1" stop-color="#F5E7C2"/>
+    </linearGradient>
+    <radialGradient id="lampGlow" cx="0" cy="0" r="1" gradientTransform="translate(1230 520) rotate(90) scale(430 510)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAC675" stop-opacity="0.42"/>
+      <stop offset="0.38" stop-color="#D8AA5B" stop-opacity="0.17"/>
+      <stop offset="1" stop-color="#D8AA5B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonGlow" cx="0" cy="0" r="1" gradientTransform="translate(1274 315) rotate(90) scale(250)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F1D995" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#F1D995" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur40" x="-100" y="-100" width="1800" height="1200" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+    <filter id="blur18" x="-100" y="-100" width="1800" height="1200" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="tableShadow" x="580" y="690" width="1000" height="350" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="25"/>
+    </filter>
+    <filter id="softShadow" x="640" y="650" width="700" height="280" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#wall)"/>
+  <rect width="1000" height="780" fill="url(#leftShade)"/>
+
+  <!-- quiet atmosphere and window light -->
+  <ellipse cx="1230" cy="535" rx="520" ry="430" fill="url(#lampGlow)" filter="url(#blur40)"/>
+  <ellipse cx="1270" cy="315" rx="270" ry="250" fill="url(#moonGlow)" filter="url(#blur18)"/>
+  <g opacity="0.28" fill="#D8AA5B">
+    <circle cx="284" cy="192" r="3"/>
+    <circle cx="442" cy="326" r="2"/>
+    <circle cx="680" cy="168" r="3"/>
+    <circle cx="918" cy="255" r="2"/>
+    <circle cx="1510" cy="220" r="3"/>
+  </g>
+
+  <!-- tall window -->
+  <rect x="1080" y="112" width="420" height="560" rx="20" fill="#04170F" fill-opacity="0.58" stroke="#8EB69B" stroke-opacity="0.18" stroke-width="3"/>
+  <rect x="1106" y="138" width="368" height="508" rx="10" fill="url(#windowGlass)"/>
+  <path d="M1290 138V646M1106 390H1474" stroke="#B7D3B3" stroke-opacity="0.18" stroke-width="8"/>
+  <path d="M1106 570C1208 518 1316 536 1474 468V646H1106V570Z" fill="#0C3828" fill-opacity="0.45"/>
+  <path d="M1140 548C1198 490 1244 498 1292 536C1340 574 1404 540 1460 496" stroke="#D0C38D" stroke-opacity="0.24" stroke-width="5"/>
+  <circle cx="1274" cy="315" r="55" fill="#F0D88E" fill-opacity="0.36"/>
+
+  <!-- shelf and plants -->
+  <path d="M1020 610H1512" stroke="#8F6945" stroke-opacity="0.6" stroke-width="14"/>
+  <path d="M1036 624V690M1494 624V690" stroke="#332114" stroke-width="12"/>
+  <g opacity="0.72">
+    <path d="M1050 596C1038 534 1072 503 1095 469C1089 538 1123 564 1114 604" fill="#2F7253"/>
+    <path d="M1102 596C1114 532 1158 520 1186 478C1176 548 1204 575 1188 604" fill="#3C8A62"/>
+    <path d="M1085 604C1085 548 1080 512 1080 474" stroke="#86B68A" stroke-width="4"/>
+  </g>
+  <g opacity="0.8">
+    <rect x="1340" y="560" width="70" height="78" rx="5" fill="#BDAA7C"/>
+    <rect x="1350" y="545" width="50" height="17" rx="3" fill="#D2BD88"/>
+    <path d="M1354 575H1396M1354 590H1396M1354 605H1380" stroke="#735F3E" stroke-width="3" opacity="0.7"/>
+  </g>
+
+  <!-- floor and table -->
+  <path d="M0 716C430 680 984 686 1600 720V1000H0V716Z" fill="url(#floor)"/>
+  <ellipse cx="1080" cy="875" rx="510" ry="112" fill="#020A06" fill-opacity="0.72" filter="url(#tableShadow)"/>
+  <path d="M620 730C874 704 1254 704 1556 746L1518 830C1218 804 909 808 650 848L620 730Z" fill="url(#tableTop)"/>
+  <path d="M690 824L766 824L720 1000H642L690 824ZM1428 813L1500 818L1560 1000H1478L1428 813Z" fill="#271A12"/>
+  <path d="M708 756C940 733 1234 741 1504 774" stroke="#A8784D" stroke-opacity="0.34" stroke-width="7"/>
+
+  <!-- lamp -->
+  <path d="M1282 706V511" stroke="#D6B271" stroke-opacity="0.7" stroke-width="10"/>
+  <path d="M1224 516C1230 474 1262 450 1290 450C1318 450 1350 474 1356 516L1324 545H1256L1224 516Z" fill="#D8AA5B"/>
+  <path d="M1230 505C1244 473 1266 461 1290 461C1314 461 1337 473 1350 505C1312 519 1268 519 1230 505Z" fill="#F6D98C" fill-opacity="0.8"/>
+  <ellipse cx="1290" cy="705" rx="75" ry="11" fill="#D8AA5B" fill-opacity="0.5"/>
+  <circle cx="1290" cy="493" r="18" fill="#FFF1B6" filter="url(#blur18)"/>
+
+  <!-- open book -->
+  <ellipse cx="948" cy="803" rx="300" ry="54" fill="#0A100B" fill-opacity="0.7" filter="url(#softShadow)"/>
+  <path d="M683 734C770 702 866 706 955 764L951 836C852 793 760 789 676 810L683 734Z" fill="url(#bookLeft)"/>
+  <path d="M955 764C1053 704 1145 703 1238 736L1249 812C1148 790 1052 793 951 836L955 764Z" fill="url(#bookRight)"/>
+  <path d="M955 764V836" stroke="#8B7149" stroke-width="6"/>
+  <path d="M720 744C792 727 854 735 925 771M710 766C792 749 854 756 925 790M1000 772C1074 733 1142 730 1205 748M992 795C1070 758 1138 755 1212 772" stroke="#9C855B" stroke-opacity="0.5" stroke-width="5" stroke-linecap="round"/>
+  <path d="M806 721C842 714 884 723 914 743" stroke="#F8EBCB" stroke-width="5" stroke-opacity="0.7"/>
+
+  <!-- foreground book stack -->
+  <g transform="translate(450 770) rotate(-8)">
+    <rect x="0" y="0" width="220" height="30" rx="7" fill="#C99045"/>
+    <rect x="14" y="-35" width="225" height="34" rx="7" fill="#1F6A4C"/>
+    <rect x="30" y="-73" width="198" height="36" rx="7" fill="#8FAF8B"/>
+    <path d="M54 -56H196" stroke="#F4E6C0" stroke-opacity="0.5" stroke-width="4"/>
+  </g>
+
+  <!-- dark edge keeps headline readable -->
+  <rect width="860" height="1000" fill="url(#leftShade)"/>
+  <rect y="0" width="1600" height="1000" fill="#03130D" fill-opacity="0.08"/>
+</svg>

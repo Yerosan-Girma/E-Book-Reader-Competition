@@ -5,11 +5,13 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() =>
+    Boolean(localStorage.getItem('readrise.token')),
+  );
 
   useEffect(() => {
     const token = localStorage.getItem('readrise.token');
-    if (!token) { setLoading(false); return; }
+    if (!token) return;
     api.get('/auth/me')
       .then(({ data }) => setUser(data.user))
       .catch(() => localStorage.removeItem('readrise.token'))
@@ -40,4 +42,6 @@ export function AuthProvider({ children }) {
   );
 }
 
+// The hook is intentionally colocated with its provider for a stable public API.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
