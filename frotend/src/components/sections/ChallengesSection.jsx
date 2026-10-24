@@ -1,136 +1,50 @@
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Flame, BookOpen, Compass, ArrowRight } from 'lucide-react';
-import SectionHeading from '../ui/SectionHeading';
-import { demoChallenges } from '../../data/demoChallenges';
-import LandingBackdrop from '../ui/LandingBackdrop';
+import { useState } from 'react';
+import { Clock, Flame, BookCheck, Sparkles, Check } from 'lucide-react';
+import { toast } from 'sonner';
+import { Reveal, SectionHeading, ProgressBar, DemoTag } from '../ui/primitives';
 
-const iconMap = { flame: Flame, book: BookOpen, compass: Compass };
-
-const cardAccents = [
-  { top: 'from-forest-400 to-[#1a5c45]', light: 'rgba(23,76,56,0.08)', border: 'rgba(23,76,56,0.15)' },
-  { top: 'from-gold-500 to-gold-400',      light: 'rgba(196,150,62,0.08)', border: 'rgba(196,150,62,0.2)' },
-  { top: 'from-[#2C7054] to-forest-400',   light: 'rgba(44,112,84,0.08)', border: 'rgba(44,112,84,0.15)' },
+const initialChallenges = [
+  { id: 'daily', t: 'Daily Reader', goal: 'Read for 15 minutes.', progress: 60, status: 'In Progress', I: Clock, meta: '9 / 15 min' },
+  { id: 'streak', t: 'Five-Day Streak', goal: 'Read on five days this week.', progress: 80, status: 'In Progress', I: Flame, meta: '4 / 5 days' },
+  { id: 'finish', t: 'Finish a Book', goal: 'Complete a book.', progress: 100, status: 'Completed', I: BookCheck, meta: '1 / 1 book' },
+  { id: 'explore', t: 'Explore Something New', goal: 'Read from a new category.', progress: 0, status: 'Available', I: Sparkles, meta: 'Science · History · Tech' },
 ];
 
 export default function ChallengesSection() {
+  const [items, setItems] = useState(initialChallenges);
+  const join = (id) => {
+    setItems((xs) => xs.map((x) => (x.id === id ? { ...x, status: 'In Progress', progress: 8, meta: 'Just started' } : x)));
+    toast.success('Challenge joined', { description: 'Demo only — progress is not saved.' });
+  };
   return (
-    <section
-      id="challenges"
-      className="py-28 relative overflow-hidden scroll-mt-24"
-      style={{ background: 'linear-gradient(to bottom, #FFFCF6, #F5F9F5)' }}
-    >
-      <LandingBackdrop variant="reader" />
-      {/* Background decoration */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sage-200 to-transparent" />
-        <div
-          className="absolute bottom-0 right-0 w-[500px] h-[400px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(44,112,84,0.07) 0%, transparent 65%)', filter: 'blur(60px)' }}
-        />
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <SectionHeading
-            eyebrow="Reading Goals"
-            heading="Small habits. Meaningful milestones."
-            description="Join challenges, track your progress, and celebrate your achievements."
-            align="center"
-            className="mx-auto mb-16"
-          />
-        </motion.div>
-
-        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-          {demoChallenges.map((challenge, index) => {
-            const Icon = iconMap[challenge.icon];
-            const accent = cardAccents[index % cardAccents.length];
-            return (
-              <motion.div
-                key={challenge.id}
-                initial={{ opacity: 0, y: 35 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.6, delay: index * 0.12, ease: [0.2, 0.8, 0.2, 1] }}
-                whileHover={{ y: -6, transition: { duration: 0.25 } }}
-                className="group relative rounded-2xl overflow-hidden"
-                style={{
-                  background: 'white',
-                  border: `1px solid ${accent.border}`,
-                  boxShadow: '0 2px 12px rgba(8,26,19,0.06), 0 1px 3px rgba(8,26,19,0.04)',
-                  transition: 'box-shadow 0.3s ease',
-                }}
-              >
-                {/* Top accent stripe */}
-                <div className={`h-1 bg-gradient-to-r ${accent.top}`} />
-
-                {/* Card content */}
-                <div className="p-7">
-                  {/* Icon + badge row */}
-                  <div className="flex items-start justify-between mb-6">
-                    <div
-                      className={`w-13 h-13 rounded-2xl bg-gradient-to-br ${accent.top}
-                                   text-cream-50 flex items-center justify-center shadow-md`}
-                      style={{ width: 52, height: 52 }}
-                    >
-                      <Icon className="w-6 h-6" strokeWidth={2} />
-                    </div>
-                    {/* Decorative badge dot */}
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-                      style={{ background: accent.light, color: index === 1 ? '#A67F2D' : '#174C38' }}
-                    >
-                      {['★', '◎', '◈'][index]}
-                    </div>
-                  </div>
-
-                  <h3 className="font-display text-xl text-ink mb-2 leading-snug">{challenge.title}</h3>
-                  <p className="text-ink-light text-sm leading-relaxed mb-6">{challenge.description}</p>
-
-                  {/* Meta row */}
-                  <div className="flex items-center justify-between text-xs mb-5">
-                    <span className="text-ink-muted font-medium">{challenge.duration}</span>
-                    <span className="chip chip-forest text-[10px] py-0.5">Demo challenge</span>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="h-1.5 rounded-full overflow-hidden mb-6" style={{ background: 'rgba(240,232,220,0.8)' }}>
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${challenge.progress}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.2, delay: 0.3 + index * 0.1, ease: 'easeOut' }}
-                      className={`h-full rounded-full bg-gradient-to-r ${accent.top}`}
-                    />
-                  </div>
-
-                  <Link
-                    to="/register"
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold
-                               transition-all duration-200 group-hover:shadow-sm"
-                    style={{
-                      background: accent.light,
-                      color: index === 1 ? '#A67F2D' : '#174C38',
-                      border: `1px solid ${accent.border}`,
-                    }}
-                  >
-                    Join Challenge
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
-                </div>
-              </motion.div>
-            );
-          })}
+    <section id="challenges" className="bg-cream py-28 md:py-36">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <Reveal><SectionHeading eyebrow="Reading challenges" title="Make Reading a Daily Adventure" subtitle="Set your own pace, take on new challenges, and celebrate every milestone." /></Reveal>
+          <DemoTag className="text-forest" />
         </div>
-
-        <p className="text-center text-xs text-ink-muted mt-10 italic">
-          Preview data — Join to track real progress
-        </p>
+        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {items.map((c, i) => (
+            <Reveal key={c.id} delay={i * 100}>
+              <article className={`group flex h-full flex-col rounded-2xl border p-7 transition duration-500 hover:-translate-y-1 hover:shadow-card${c.status === 'Completed' ? ' border-gold/50 bg-forest-deep text-cream' : ' border-forest/10 bg-card'}`}>
+                <div className="flex items-center justify-between">
+                  <span className={`grid h-12 w-12 place-items-center rounded-full${c.status === 'Completed' ? ' bg-gold-gradient text-forest-deep' : ' bg-sage text-forest'}`}><c.I className="h-5 w-5" /></span>
+                  <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider${c.status === 'Completed' && ' bg-gold/20 text-gold-soft'}${c.status === 'In Progress' && ' bg-forest/10 text-forest'}${c.status === 'Available' && ' bg-muted text-muted-foreground'}`}>{c.status}</span>
+                </div>
+                <h3 className={`mt-8 text-2xl${c.status === 'Completed' ? ' text-cream' : ' text-forest-deep'}`}>{c.t}</h3>
+                <p className={`mt-2 text-sm${c.status === 'Completed' ? ' text-cream/60' : ' text-muted-foreground'}`}>Goal: {c.goal}</p>
+                <div className="mt-auto pt-8">
+                  <div className="mb-2 flex justify-between text-xs font-medium opacity-70"><span>{c.meta}</span><span>{c.progress}%</span></div>
+                  <ProgressBar value={c.progress} className={c.status === 'Completed' ? 'bg-cream/10' : undefined} />
+                  {c.status === 'Available' && (
+                    <button onClick={() => join(c.id)} className="mt-5 w-full rounded-full bg-forest py-2.5 text-sm font-semibold text-cream transition hover:bg-forest-soft">Join challenge</button>
+                  )}
+                  {c.status === 'Completed' && <p className="mt-5 flex items-center gap-2 text-sm text-gold"><Check className="h-4 w-4" /> Badge earned</p>}
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );

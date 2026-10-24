@@ -1,169 +1,47 @@
-import { motion } from 'framer-motion';
-import { Trophy, Medal, Star } from 'lucide-react';
-import SectionHeading from '../ui/SectionHeading';
-import { demoLeaderboard } from '../../data/demoLeaderboard';
-import LandingBackdrop from '../ui/LandingBackdrop';
+import { Crown, ArrowRight } from 'lucide-react';
+import { toast } from 'sonner';
+import { Reveal, SectionHeading, DemoTag } from '../ui/primitives';
 
-const rankGlows = [
-  { border: 'rgba(216,170,91,0.6)', bg: 'linear-gradient(135deg, #D8AA5B, #E8C982)', glow: '0 0 20px rgba(216,170,91,0.35)' },
-  { border: 'rgba(180,185,190,0.6)', bg: 'linear-gradient(135deg, #B0B8C0, #C8D0D8)', glow: '0 0 12px rgba(180,185,190,0.25)' },
-  { border: 'rgba(200,150,90,0.5)',  bg: 'linear-gradient(135deg, #C89660, #D8AA80)', glow: 'none' },
+const readers = [
+  { n: 'Reader Tsion', b: 18, c: 9, s: 1240 },
+  { n: 'Reader Kidus', b: 15, c: 11, s: 1185 },
+  { n: 'Reader Mahlet', b: 14, c: 7, s: 1020 },
+  { n: 'Reader Nahom', b: 11, c: 8, s: 910 },
+  { n: 'Reader Bethel', b: 9, c: 6, s: 780 },
 ];
 
 export default function LeaderboardPreview() {
   return (
-    <section
-      id="leaderboard"
-      className="py-28 relative overflow-hidden scroll-mt-24"
-      style={{ background: 'linear-gradient(to bottom, #F8F5ED, #FFFCF6)' }}
-    >
-      <LandingBackdrop variant="community" />
-      {/* Decorations */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cream-300 to-transparent" />
-        <div
-          className="absolute -top-10 right-0 w-[450px] h-[350px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(216,170,91,0.08) 0%, transparent 65%)', filter: 'blur(50px)' }}
-        />
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <SectionHeading
-            eyebrow="Community"
-            heading="Celebrate the joy of reading."
-            description="Recognize consistency, curiosity, and the effort behind every page."
-            align="center"
-            className="mx-auto mb-14"
-          />
-        </motion.div>
-
-        <div className="max-w-2xl mx-auto">
-          {/* Leaderboard card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="rounded-2xl overflow-hidden"
-            style={{
-              background: 'white',
-              border: '1px solid rgba(240,232,220,0.8)',
-              boxShadow: '0 8px 32px rgba(8,26,19,0.08), 0 2px 8px rgba(8,26,19,0.04)',
-            }}
-          >
-            {/* Header */}
-            <div
-              className="px-6 py-4 flex items-center gap-3"
-              style={{ background: 'linear-gradient(135deg, #174C38, #0B2920)' }}
-            >
-              <Trophy className="w-5 h-5 text-gold-400" />
-              <span className="font-semibold text-cream-50">Top Readers This Month</span>
-              <span className="ml-auto text-xs text-cream-50/60 italic">Demo data</span>
+    <section id="leaderboard" className="bg-cream py-28 md:py-36">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal><SectionHeading eyebrow="Recognition" title="Celebrate the Love of Reading" subtitle="Recognize progress, share milestones, and be inspired by fellow readers." /></Reveal>
+        <div className="mt-16 grid gap-8 lg:grid-cols-5">
+          <Reveal className="lg:col-span-3">
+            <div className="rounded-3xl border border-border bg-card p-6 md:p-8">
+              <div className="flex items-center justify-between"><p className="font-semibold text-forest-deep">Monthly leaderboard</p><DemoTag className="text-forest" /></div>
+              <ol className="mt-6 space-y-2">
+                {readers.map((r, i) => (
+                  <li key={r.n} className={`flex items-center gap-4 rounded-xl px-4 py-3 transition hover:bg-sage/50${i === 0 && ' bg-sage/60'}`}>
+                    <span className={`w-6 font-display text-2xl${i < 3 ? ' text-gold' : ' text-muted-foreground'}`}>{i + 1}</span>
+                    <span className="grid h-10 w-10 place-items-center rounded-full bg-forest font-display text-cream">{r.n.split(' ')[1]?.[0]}</span>
+                    <span className="flex-1"><span className="block font-medium text-forest-deep">{r.n}</span><span className="text-xs text-muted-foreground">{r.b} books · {r.c} challenges</span></span>
+                    <span className="font-display text-xl text-forest">{r.s}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground">Sample scoring: 50 pts per book completed + 20 pts per challenge + 1 pt per reading minute (illustrative only).</p>
             </div>
-
-            {/* Entries */}
-            <div>
-              {demoLeaderboard.map((reader, index) => {
-                const isTop3 = reader.rank <= 3;
-                const glowStyle = isTop3 ? rankGlows[reader.rank - 1] : null;
-                return (
-                  <motion.div
-                    key={reader.rank}
-                    initial={{ opacity: 0, x: -15 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.45, delay: index * 0.07 }}
-                    className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-cream-50"
-                    style={{
-                      borderBottom: index < demoLeaderboard.length - 1 ? '1px solid rgba(240,232,220,0.6)' : 'none',
-                      background: reader.rank === 1 ? 'rgba(216,170,91,0.04)' : undefined,
-                    }}
-                  >
-                    {/* Rank */}
-                    <div className="w-8 flex items-center justify-center flex-shrink-0">
-                      {reader.rank === 1 && <span className="text-2xl" role="img" aria-label="Gold medal">🥇</span>}
-                      {reader.rank === 2 && <span className="text-2xl" role="img" aria-label="Silver medal">🥈</span>}
-                      {reader.rank === 3 && <span className="text-2xl" role="img" aria-label="Bronze medal">🥉</span>}
-                      {reader.rank > 3 && (
-                        <span className="text-sm font-bold text-ink-muted">#{reader.rank}</span>
-                      )}
-                    </div>
-
-                    {/* Avatar */}
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-                      style={{
-                        background: isTop3 ? glowStyle.bg : 'linear-gradient(135deg, #2C7054, #174C38)',
-                        color: 'white',
-                        boxShadow: isTop3 ? glowStyle.glow : 'none',
-                        border: isTop3 ? `2px solid ${glowStyle.border}` : '2px solid transparent',
-                      }}
-                    >
-                      {reader.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                    </div>
-
-                    {/* Name */}
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-medium text-ink truncate ${reader.rank === 1 ? 'font-semibold' : ''}`}>
-                        {reader.name}
-                      </p>
-                      {reader.rank <= 3 && (
-                        <p className="text-[10px] text-ink-muted flex items-center gap-1">
-                          <Star className="w-2.5 h-2.5 text-gold-400" />
-                          Top reader
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Points */}
-                    <div className="text-right flex-shrink-0">
-                      <p
-                        className="font-bold text-sm"
-                        style={{ color: reader.rank === 1 ? '#A67F2D' : '#174C38' }}
-                      >
-                        {reader.points.toLocaleString()}
-                      </p>
-                      <p className="text-[10px] text-ink-muted">pts</p>
-                    </div>
-                  </motion.div>
-                );
-              })}
+          </Reveal>
+          <Reveal delay={150} className="lg:col-span-2">
+            <div className="relative h-full overflow-hidden rounded-3xl bg-forest-deep p-10 text-cream">
+              <div aria-hidden className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gold/25 blur-3xl animate-shimmer" />
+              <Crown className="relative h-10 w-10 text-gold" strokeWidth={1.3} />
+              <p className="eyebrow relative mt-8 text-gold">Coming soon</p>
+              <h3 className="relative mt-3 text-4xl md:text-5xl">Reader of the Year</h3>
+              <p className="relative mt-5 text-cream/70">A future opportunity to celebrate dedication, consistency, and a passion for reading.</p>
+              <button onClick={() => toast("We'll let you know", { description: 'Details will be shared when the program is announced.' })} className="relative mt-10 inline-flex items-center gap-2 rounded-full border border-gold/50 px-6 py-3 text-sm font-semibold text-gold transition hover:bg-gold hover:text-forest-deep">Notify me <ArrowRight className="h-4 w-4" /></button>
             </div>
-          </motion.div>
-
-          {/* Reader of the Year */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-10 text-center"
-          >
-            <div
-              className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full mb-4"
-              style={{
-                background: 'rgba(216,170,91,0.1)',
-                border: '1px solid rgba(216,170,91,0.3)',
-              }}
-            >
-              <Medal className="w-4 h-4" style={{ color: '#D8AA5B' }} />
-              <span className="text-sm font-semibold" style={{ color: '#A67F2D' }}>Reader of the Year</span>
-              <span className="text-xs text-ink-muted">coming soon</span>
-            </div>
-            <p className="text-sm text-ink-light max-w-md mx-auto leading-relaxed">
-              An opportunity to celebrate remarkable reading journeys and inspire
-              the next generation of readers across Ethiopia.
-            </p>
-            <p className="text-xs text-ink-muted mt-3 italic">
-              Official competition and prizes subject to published rules and confirmed funding.
-            </p>
-          </motion.div>
+          </Reveal>
         </div>
       </div>
     </section>

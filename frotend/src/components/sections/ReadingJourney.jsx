@@ -1,137 +1,27 @@
-import { motion } from 'framer-motion';
-import { BookOpen, Target, Trophy } from 'lucide-react';
-import SectionHeading from '../ui/SectionHeading';
-import LandingBackdrop from '../ui/LandingBackdrop';
-
-const steps = [
-  {
-    icon: BookOpen,
-    num: '01',
-    title: 'Discover',
-    description: 'Find books that match your curiosity — fiction, self-development, science, and more.',
-    color: 'from-forest-400 to-forest-500',
-    accentColor: 'rgba(23,76,56,0.12)',
-  },
-  {
-    icon: Target,
-    num: '02',
-    title: 'Build your rhythm',
-    description: 'Set goals, track your progress, and develop a consistent reading habit that sticks.',
-    color: 'from-[#1a5c45] to-forest-500',
-    accentColor: 'rgba(26,92,69,0.12)',
-  },
-  {
-    icon: Trophy,
-    num: '03',
-    title: 'Celebrate your growth',
-    description: 'Complete challenges, earn recognition, and celebrate every milestone you reach.',
-    color: 'from-gold-500 to-gold-600',
-    accentColor: 'rgba(196,150,62,0.12)',
-  },
-];
+import { Clock, LineChart, Award } from 'lucide-react';
+import library from '../../assets/library.jpg';
+import { Reveal, SectionHeading, Particles } from '../ui/primitives';
 
 export default function ReadingJourney() {
+  const items = [
+    { I: Clock, t: 'Build a consistent reading habit.', d: 'Short daily sessions add up to real change.' },
+    { I: LineChart, t: 'See your progress over time.', d: 'Minutes, pages, and streaks — all in one view.' },
+    { I: Award, t: 'Celebrate every completed milestone.', d: 'Badges that mark how far you have come.' },
+  ];
   return (
-    <section
-      id="reading-journey"
-      className="py-28 relative overflow-hidden scroll-mt-24"
-      style={{ background: 'linear-gradient(160deg, #F8F5ED 0%, #F5F9F5 60%, #F8F5ED 100%)' }}
-    >
-      <LandingBackdrop variant="reader" />
-      {/* Background decoration */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sage-200 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sage-200 to-transparent" />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full"
-          style={{
-            background: 'radial-gradient(ellipse, rgba(44,112,84,0.06) 0%, transparent 65%)',
-            filter: 'blur(40px)',
-          }}
-        />
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <SectionHeading
-            eyebrow="How It Works"
-            heading="Make reading a part of your life."
-            description="Three simple steps to build a lasting reading habit."
-            align="center"
-            className="mx-auto mb-20"
-          />
-        </motion.div>
-
-        {/* Steps */}
-        <div className="grid md:grid-cols-3 gap-8 md:gap-6 relative">
-          {/* Connecting line — desktop */}
-          <div
-            className="hidden md:block absolute top-16 left-[22%] right-[22%] h-px"
-            style={{
-              background: 'linear-gradient(to right, rgba(23,76,56,0.2), rgba(216,170,91,0.4), rgba(23,76,56,0.2))',
-            }}
-            aria-hidden="true"
-          />
-
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.title}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.65, delay: index * 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-              className="relative group"
-            >
-              {/* Card */}
-              <div
-                className="relative rounded-2xl p-8 transition-all duration-300
-                            hover:shadow-lg hover:-translate-y-1"
-                style={{
-                  background: 'rgba(255,255,255,0.7)',
-                  border: '1px solid rgba(240,232,220,0.8)',
-                  backdropFilter: 'blur(12px)',
-                }}
-              >
-                {/* Large step number watermark */}
-                <span
-                  className="absolute top-4 right-5 font-display text-7xl font-bold select-none pointer-events-none"
-                  style={{ color: step.accentColor, lineHeight: 1 }}
-                  aria-hidden="true"
-                >
-                  {step.num}
-                </span>
-
-                {/* Icon */}
-                <div
-                  className={`relative w-14 h-14 rounded-2xl bg-gradient-to-br ${step.color}
-                               text-cream-50 flex items-center justify-center shadow-md mb-6 z-10`}
-                >
-                  <step.icon className="w-6 h-6" strokeWidth={2} />
-                </div>
-
-                {/* Step number pill */}
-                <span
-                  className="inline-block text-xs font-bold uppercase tracking-widest mb-3"
-                  style={{ color: step.num === '03' ? '#A67F2D' : '#174C38' }}
-                >
-                  Step {step.num}
-                </span>
-
-                <h3 className="font-display text-xl md:text-2xl text-ink mb-3">{step.title}</h3>
-                <p className="text-ink-light leading-relaxed text-sm md:text-base">{step.description}</p>
-
-                {/* Bottom accent line */}
-                <div
-                  className={`absolute bottom-0 left-8 right-8 h-0.5 rounded-full bg-gradient-to-r ${step.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-                  aria-hidden="true"
-                />
-              </div>
-            </motion.div>
+    <section className="relative overflow-hidden bg-forest-deep py-32 md:py-44">
+      <img src={library} alt="" loading="lazy" width={1920} height={1088} className="absolute inset-0 h-full w-full object-cover opacity-40" />
+      <div className="absolute inset-0 bg-gradient-to-b from-forest-deep via-forest-deep/70 to-forest-deep" />
+      <Particles count={14} />
+      <div className="relative mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal><SectionHeading light center eyebrow="The reading journey" title="Small Reading Moments. Lasting Change." subtitle="A few intentional minutes each day can help you build a reading routine that lasts." /></Reveal>
+        <div className="mt-20 grid gap-px overflow-hidden rounded-2xl bg-cream/10 md:grid-cols-3">
+          {items.map((it, i) => (
+            <Reveal key={it.t} delay={i * 150} className="bg-forest-deep/80 p-10 backdrop-blur-sm transition hover:bg-forest/60">
+              <it.I className="h-8 w-8 text-gold" strokeWidth={1.4} />
+              <h3 className="mt-8 text-2xl text-cream">{it.t}</h3>
+              <p className="mt-3 text-cream/60">{it.d}</p>
+            </Reveal>
           ))}
         </div>
       </div>

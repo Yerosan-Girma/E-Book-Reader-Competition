@@ -6,26 +6,61 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/layout/Footer';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { getBook } from '../data/readrise-data';
 
 export default function BookDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const nav = useNavigate();
-  const [book, setBook] = useState(null);
-  const [chapters, setChapters] = useState([]);
+
+  const fallback = getBook(id);
+  const numericId = fallback?.id || (isNaN(Number(id)) ? null : Number(id));
+
+  const [book, setBook] = useState(() => fallback || null);
+  const [chapters, setChapters] = useState(() => fallback?.chapters || []);
+  const [loading, setLoading] = useState(() => !fallback);
+  const [error, setError] = useState(() =>
+    !numericId && !fallback ? 'The requested book could not be found.' : null
+  );
 
   useEffect(() => {
-    api.get(`/books/${id}`).then(({ data }) => setBook(data)).catch(() => {});
-    api.get(`/books/${id}/chapters`).then(({ data }) => setChapters(data)).catch(() => {});
-  }, [id]);
+    let cancelled = false;
+    if (!numericId) return;
+
+    Promise.all([
+      api.get(`/books/${numericId}`).then(({ data }) => data).catch(() => null),
+      api.get(`/books/${numericId}/chapters`).then(({ data }) => data).catch(() => null),
+    ]).then(([liveBook, liveChapters]) => {
+      if (cancelled) return;
+      if (liveBook) {
+        setBook((prev) => ({ ...(prev || fallback), ...liveBook }));
+      } else if (!fallback) {
+        setError('Failed to load book details.');
+      }
+      if (Array.isArray(liveChapters) && liveChapters.length > 0) {
+        setChapters(liveChapters);
+      }
+      setLoading(false);
+    });
+
+    return () => { cancelled = true; };
+  }, [numericId]); // eslint-disable-line
 
   const startReading = () => {
     if (!user) return nav('/login');
-    const first = chapters[0]?.id;
-    nav(first ? `/read/${book.id}?chapter=${first}` : `/read/${book.id}`);
+
+    const bookId = book?.id || id;
+    if (chapters.length > 0) {
+      const first = chapters[0]?.id;
+      nav(first ? `/read/${bookId}?chapter=${first}` : `/read/${bookId}`);
+    } else if (book?.file_url) {
+      nav(`/read/${bookId}`);
+    } else {
+      nav(`/read/${bookId}`);
+    }
   };
 
-  if (!book) {
+  if (!book && loading) {
     return (
       <div className="min-h-screen bg-cream-50 flex flex-col justify-between">
         <Navbar />
@@ -39,6 +74,30 @@ export default function BookDetail() {
           <p className="text-sm font-medium text-ink-light animate-pulse mt-1">
             Loading book details…
           </p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!book && !loading) {
+    return (
+      <div className="min-h-screen bg-cream-50 flex flex-col justify-between">
+        <Navbar />
+        <div className="pt-36 pb-32 flex flex-col items-center justify-center text-center px-6">
+          <BookOpen className="w-14 h-14 text-forest-400/60 mb-4" />
+          <h1 className="font-display text-3xl text-ink mb-2">Book Not Found</h1>
+          <p className="text-sm text-ink-light max-w-md mb-8">
+            {error || "We couldn't find the requested book details in the library."}
+          </p>
+          <div className="flex gap-4">
+            <Link to="/" className="btn btn-primary px-6 py-2.5">
+              Go to Home
+            </Link>
+            <Link to="/explore" className="btn btn-outline px-6 py-2.5">
+              Explore Library
+            </Link>
+          </div>
         </div>
         <Footer />
       </div>
@@ -251,7 +310,7 @@ export default function BookDetail() {
             )}
 
             {/* 6. CTA: btn btn-primary with golden shadow on hover */}
-            <motion.div variants={detailItemVariants} className="mt-8">
+            <motion.div variants={detailItemVariants} className="mt-8 flex flex-wrap gap-3">
               <button
                 onClick={startReading}
                 className="btn btn-primary text-base px-8 py-3.5 shadow-md hover:shadow-gold flex items-center gap-3 group transition-all duration-300"
@@ -259,6 +318,18 @@ export default function BookDetail() {
                 <span>Start Reading</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200" />
               </button>
+
+              {book.file_url && (
+                <a
+                  href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/books/${book.id}/file`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline-dark text-base px-8 py-3.5 flex items-center gap-3 group transition-all duration-300"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>Download File</span>
+                </a>
+              )}
             </motion.div>
 
             {/* 7. Chapters list: numbered with leading zeros, hover highlight, gold accent on number, animated stagger entrance */}
