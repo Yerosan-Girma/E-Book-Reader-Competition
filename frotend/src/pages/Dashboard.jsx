@@ -72,7 +72,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cream-50 via-cream-100/60 to-sage-100/40 relative overflow-hidden flex flex-col justify-between">
+    <div className="min-h-screen bg-gradient-to-b from-cream-50 via-cream-100/60 to-sage-100/40 relative overflow-hidden flex flex-col justify-between lg:pb-0 pb-20">
       {/* Background decorations */}
       <div className="bg-blobs" aria-hidden="true" />
       <div className="grain-overlay" aria-hidden="true" />
@@ -81,19 +81,19 @@ export default function Dashboard() {
 
       <Navbar />
 
-      <main className="relative z-20 max-w-6xl mx-auto px-6 pt-24 pb-16 w-full flex-1">
+      <main className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16 w-full flex-1">
         {/* Animated greeting section */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-          className="flex flex-wrap items-end justify-between gap-4 mt-6"
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mt-6"
         >
           <div>
             <div className="section-eyebrow mb-1">
               {getGreeting()}
             </div>
-            <h1 className="font-display text-3xl sm:text-4xl text-ink font-bold tracking-tight">
+            <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl text-ink font-bold tracking-tight">
               Hi, {user.display_name || user.username}.
             </h1>
             <p className="text-sm text-ink-light mt-1">
@@ -103,7 +103,7 @@ export default function Dashboard() {
           {data.activeSession && (
             <Link
               to={`/read/${data.activeSession.book_id}`}
-              className="btn btn-gold shadow-gold flex items-center gap-2 group"
+              className="btn btn-gold shadow-gold flex items-center justify-center gap-2 group w-full sm:w-auto"
             >
               <PlayCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
               <span>Resume Session</span>
@@ -117,31 +117,31 @@ export default function Dashboard() {
             initial={{ opacity: 0, scale: 0.98, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-6 relative overflow-hidden rounded-2xl p-5 border border-gold-400/40 shadow-gold"
+            className="mt-6 relative overflow-hidden rounded-2xl p-4 sm:p-5 border border-gold-400/40 shadow-gold"
             style={{
               background: 'linear-gradient(135deg, rgba(232, 201, 130, 0.25) 0%, rgba(216, 170, 91, 0.15) 50%, rgba(196, 150, 62, 0.2) 100%)',
             }}
           >
             <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-gold-400/20 blur-2xl animate-pulse" />
-            <div className="relative flex flex-wrap items-center justify-between gap-4">
+            <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
-                <div className="relative flex items-center justify-center">
+                <div className="relative flex items-center justify-center flex-shrink-0">
                   <span className="w-3.5 h-3.5 rounded-full bg-gold-500 animate-ping absolute opacity-75" />
                   <span className="w-3 h-3 rounded-full bg-gold-500 relative" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-bold uppercase tracking-wider text-gold-600">Active Reading Session</span>
                     <span className="chip chip-gold text-[10px] py-0.5 px-2">In Progress</span>
                   </div>
-                  <p className="text-sm font-semibold text-ink mt-0.5">
+                  <p className="text-sm font-semibold text-ink mt-0.5 truncate">
                     Session in progress for <span className="italic">{data.activeSession.book_title || 'your book'}</span>
                   </p>
                 </div>
               </div>
               <Link
                 to={`/read/${data.activeSession.book_id}`}
-                className="btn btn-gold text-xs px-4 py-2 flex items-center gap-2 shadow-sm"
+                className="btn btn-gold text-xs px-4 py-2.5 flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
               >
                 <PlayCircle className="w-4 h-4" /> Resume Reading
               </Link>
@@ -150,7 +150,7 @@ export default function Dashboard() {
         )}
 
         {/* Stat cards grid with Framer Motion staggered entrance */}
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="mt-6 sm:mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {statCards.map((card, i) => (
             <StatCard
               key={card.label}
@@ -165,21 +165,21 @@ export default function Dashboard() {
         </div>
 
         {/* Two-column layout: Weekly chart & Recently read */}
-        <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <div className="mt-6 sm:mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           {/* Weekly chart section in a premium card */}
           <motion.div
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="card p-6 sm:p-7 flex flex-col justify-between"
+            className="card p-4 sm:p-6 lg:p-7 flex flex-col justify-between"
           >
             <div>
-              <div className="flex items-center justify-between flex-wrap gap-2 pb-4 border-b border-cream-200/70">
+              <div className="flex items-center justify-between flex-wrap gap-2 pb-3 sm:pb-4 border-b border-cream-200/70">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="font-display text-xl text-ink font-semibold">Weekly Rhythm</h2>
-                    <span className="chip chip-forest text-[11px]">Last 7 Days</span>
+                    <h2 className="font-display text-lg sm:text-xl text-ink font-semibold">Weekly Rhythm</h2>
+                    <span className="chip chip-forest text-[10px] sm:text-[11px]">Last 7 Days</span>
                   </div>
                   <p className="text-xs text-ink-light mt-1">Your daily reading investment in minutes</p>
                 </div>
@@ -192,9 +192,10 @@ export default function Dashboard() {
               </div>
 
               {/* Chart area */}
-              <div className="mt-8 flex items-end justify-between gap-2 sm:gap-4 h-52 pb-2 px-1">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayLabel, i) => {
-                  const row = data.weekly?.find((r) => r.label.trim() === dayLabel);
+              <div className="mt-6 sm:mt-8 flex items-end justify-between gap-1 sm:gap-2 lg:gap-4 h-40 sm:h-52 pb-2 px-1">
+                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((dayLabel, i) => {
+                  const fullDay = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i];
+                  const row = data.weekly?.find((r) => r.label.trim() === fullDay);
                   const rowSec = row ? row.seconds : 0;
                   const h = Math.max(8, Math.round((rowSec / maxWeek) * 100));
                   const min = Math.round(rowSec / 60);
@@ -202,17 +203,17 @@ export default function Dashboard() {
                   return (
                     <div
                       key={`weekly-${dayLabel}`}
-                      className="flex-1 flex flex-col items-center gap-2.5 group relative h-full justify-end"
+                      className="flex-1 flex flex-col items-center gap-1.5 sm:gap-2.5 group relative h-full justify-end"
                     >
                       {/* Tooltip on hover showing minutes */}
-                      <div className="absolute -top-9 left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
-                        <div className="bg-forest-600 text-cream-50 text-[11px] font-semibold py-1 px-2.5 rounded-lg shadow-md whitespace-nowrap border border-forest-400/30">
+                      <div className="absolute -top-7 sm:-top-9 left-1/2 -translate-x-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
+                        <div className="bg-forest-600 text-cream-50 text-[10px] sm:text-[11px] font-semibold py-1 px-2 sm:px-2.5 rounded-lg shadow-md whitespace-nowrap border border-forest-400/30">
                           {min}m
                         </div>
                       </div>
 
                       {/* Bar container */}
-                      <div className="w-full max-w-[42px] h-[160px] flex items-end justify-center rounded-lg bg-cream-100/80 p-1">
+                      <div className="w-full max-w-[32px] sm:max-w-[42px] h-[120px] sm:h-[160px] flex items-end justify-center rounded-lg bg-cream-100/80 p-0.5 sm:p-1">
                         <motion.div
                           initial={{ height: 0 }}
                           whileInView={{ height: `${h}%` }}
@@ -223,7 +224,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Day label */}
-                      <span className="text-xs font-medium text-ink-light group-hover:text-forest-400 transition-colors">
+                      <span className="text-[10px] sm:text-xs font-medium text-ink-light group-hover:text-forest-400 transition-colors">
                         {dayLabel}
                       </span>
                     </div>
@@ -232,8 +233,9 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-cream-200/50 flex items-center justify-between text-xs text-ink-muted">
-              <span>Consistency is the secret of mastery</span>
+            <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-cream-200/50 flex items-center justify-between text-[10px] sm:text-xs text-ink-muted">
+              <span className="hidden sm:inline">Consistency is the secret of mastery</span>
+              <span className="sm:hidden">Keep reading daily</span>
               <span className="flex items-center gap-1.5 font-medium">
                 <span className="w-2 h-2 rounded-full bg-forest-400 inline-block" />
                 Minutes read
@@ -247,12 +249,12 @@ export default function Dashboard() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="card p-6 sm:p-7 flex flex-col justify-between"
+            className="card p-4 sm:p-6 lg:p-7 flex flex-col justify-between"
           >
             <div>
-              <div className="flex items-center justify-between pb-4 border-b border-cream-200/70">
+              <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-cream-200/70">
                 <div>
-                  <h2 className="font-display text-xl text-ink font-semibold">Recently Read</h2>
+                  <h2 className="font-display text-lg sm:text-xl text-ink font-semibold">Recently Read</h2>
                   <p className="text-xs text-ink-light mt-1">Jump right back into your current books</p>
                 </div>
                 <Link
@@ -264,9 +266,9 @@ export default function Dashboard() {
               </div>
 
               {data.recentBooks.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="inline-flex w-16 h-16 rounded-2xl bg-cream-100 items-center justify-center mb-3 shadow-inner">
-                    <BookOpen className="w-7 h-7 text-forest-400/50" />
+                <div className="text-center py-8 sm:py-12">
+                  <div className="inline-flex w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-cream-100 items-center justify-center mb-3 shadow-inner">
+                    <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-forest-400/50" />
                   </div>
                   <p className="text-sm font-medium text-ink mb-1">No reading sessions yet</p>
                   <p className="text-xs text-ink-muted max-w-xs mx-auto mb-4">
@@ -277,17 +279,17 @@ export default function Dashboard() {
                   </Link>
                 </div>
               ) : (
-                <ul className="mt-4 space-y-2">
+                <ul className="mt-3 sm:mt-4 space-y-2">
                   {data.recentBooks.map((b) => (
                     <li key={`recent-${b.id}`}>
                       <Link
                         to={`/books/${b.id}`}
-                        className="group flex items-center gap-3.5 p-3 rounded-xl transition-all duration-200 hover:bg-cream-100/70 border border-transparent hover:border-cream-200"
+                        className="group flex items-center gap-3 sm:gap-3.5 p-2.5 sm:p-3 rounded-xl transition-all duration-200 hover:bg-cream-100/70 border border-transparent hover:border-cream-200"
                       >
                         {/* Mini gradient cover */}
-                        <div className="relative w-10 h-14 rounded-md bg-gradient-to-br from-forest-500 via-forest-400 to-forest-600 shadow-md flex items-center justify-center text-cream-50 flex-shrink-0 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                        <div className="relative w-9 h-12 sm:w-10 sm:h-14 rounded-md bg-gradient-to-br from-forest-500 via-forest-400 to-forest-600 shadow-md flex items-center justify-center text-cream-50 flex-shrink-0 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
                           <div className="book-spine" style={{ width: 4 }} />
-                          <BookOpen className="w-4 h-4 text-cream-50/90 relative z-10" />
+                          <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cream-50/90 relative z-10" />
                           <div className="book-cover-sheen" />
                         </div>
 
@@ -310,7 +312,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-cream-200/50 text-right">
+            <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-cream-200/50 text-right">
               <Link to="/books" className="text-xs text-ink-light hover:text-ink font-medium">
                 Explore entire catalog →
               </Link>
@@ -324,18 +326,18 @@ export default function Dashboard() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-forest-600 via-forest-500 to-forest-700 text-cream-50 p-8 sm:p-10 shadow-xl border border-forest-400/30 flex flex-wrap items-center justify-between gap-6"
+          className="mt-6 sm:mt-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-forest-600 via-forest-500 to-forest-700 text-cream-50 p-6 sm:p-8 lg:p-10 shadow-xl border border-forest-400/30 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6"
         >
           {/* Ambient gold glow */}
           <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-gold-400/20 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-forest-300/20 blur-3xl pointer-events-none" />
 
-          <div className="relative max-w-xl">
+          <div className="relative max-w-xl w-full">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cream-50/10 border border-cream-50/15 text-gold-300 text-xs font-semibold uppercase tracking-wider mb-3">
               <Flame className="w-3.5 h-3.5 text-gold-400" />
               Daily Momentum
             </div>
-            <h3 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-cream-50">
+            <h3 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-cream-50">
               Keep the flame burning bright.
             </h3>
             <p className="text-cream-50/75 mt-2 text-sm sm:text-base leading-relaxed">
@@ -345,7 +347,7 @@ export default function Dashboard() {
 
           <Link
             to="/books"
-            className="relative btn btn-gold shadow-gold flex items-center gap-2 group flex-shrink-0"
+            className="relative btn btn-gold shadow-gold flex items-center justify-center gap-2 group flex-shrink-0 w-full sm:w-auto"
           >
             <span>Find a Book</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

@@ -2,7 +2,9 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import MobileBottomNav from './components/MobileBottomNav';
 
 import Landing      from './pages/Landing';
 
@@ -15,6 +17,7 @@ const Register = lazy(() => import('./pages/Register'));
 const Challenges = lazy(() => import('./pages/Challenges'));
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const About = lazy(() => import('./pages/About'));
+const Admin = lazy(() => import('./pages/Admin'));
 const StaticPlaceholder = lazy(() => import('./pages/StaticPlaceholder'));
 
 function RouteLoading() {
@@ -31,12 +34,10 @@ function RouteLoading() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <MotionConfig reducedMotion="user">
-          <a href="#main-content" className="skip-link">
-            Skip to content
-          </a>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <MotionConfig reducedMotion="user">
           <div id="main-content">
             <Suspense fallback={<RouteLoading />}>
               <Routes>
@@ -58,6 +59,10 @@ export default function App() {
               element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
             />
             <Route
+              path="/admin"
+              element={<ProtectedRoute><Admin /></ProtectedRoute>}
+            />
+            <Route
               path="/read/:id"
               element={<ProtectedRoute><Reading /></ProtectedRoute>}
             />
@@ -65,9 +70,11 @@ export default function App() {
             <Route path="*" element={<Landing />} />
               </Routes>
             </Suspense>
+            <MobileBottomNav />
           </div>
         </MotionConfig>
-      </BrowserRouter>
-    </AuthProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
