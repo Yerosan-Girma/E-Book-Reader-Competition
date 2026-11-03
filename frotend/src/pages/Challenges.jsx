@@ -270,6 +270,7 @@ export default function Challenges() {
                 const IconComponent = card.icon;
                 return (
                   <motion.div
+                    data-testid="challenge-card"
                     key={card.id}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}

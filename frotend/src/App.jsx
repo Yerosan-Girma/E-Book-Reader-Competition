@@ -18,6 +18,8 @@ const Challenges = lazy(() => import('./pages/Challenges'));
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const About = lazy(() => import('./pages/About'));
 const Admin = lazy(() => import('./pages/Admin'));
+const UploadMaterial = lazy(() => import('./pages/UploadMaterial'));
+const Profile = lazy(() => import('./pages/Profile'));
 const StaticPlaceholder = lazy(() => import('./pages/StaticPlaceholder'));
 
 function RouteLoading() {
@@ -55,16 +57,24 @@ export default function App() {
             <Route path="/register"     element={<Register />} />
 
             <Route
+              path="/upload"
+              element={<ProtectedRoute><UploadMaterial /></ProtectedRoute>}
+            />
+            <Route
+              path="/profile"
+              element={<ProtectedRoute><Profile /></ProtectedRoute>}
+            />
+            <Route
               path="/dashboard"
               element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
             />
             <Route
               path="/admin"
-              element={<ProtectedRoute><Admin /></ProtectedRoute>}
+              element={<ProtectedRoute requiredRole="admin"><Admin /></ProtectedRoute>}
             />
             <Route
               path="/read/:id"
-              element={<ProtectedRoute><Reading /></ProtectedRoute>}
+              element={<Reading />}
             />
 
             <Route path="*" element={<Landing />} />

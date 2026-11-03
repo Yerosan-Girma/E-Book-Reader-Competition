@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, LogOut, Menu, X, Upload, User, ChevronDown, Shield } from 'lucide-react';
 import { Logo } from './ui/primitives';
 import { useAuth } from '../context/AuthContext';
 
@@ -15,9 +15,22 @@ const links = [
 export default function Navbar({ solid = false }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -115,30 +128,119 @@ export default function Navbar({ solid = false }) {
               {user.role === 'admin' && (
                 <Link
                   to="/admin"
-                  className="px-3 py-2 text-sm font-medium transition rounded-lg"
-                  style={{ color: 'oklch(0.97 0.012 90 / 0.9)' }}
+                  className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition rounded-full bg-gold-500/20 text-gold-300 border border-gold-400/30 hover:bg-gold-500/30"
                 >
                   Admin
                 </Link>
               )}
+
+              <Link
+                to="/upload"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold transition rounded-full border border-gold-400/50 hover:bg-gold-400/15"
+                style={{ color: 'var(--gold, #D8AA5B)' }}
+              >
+                <Upload className="h-3.5 w-3.5" />
+                <span>Upload</span>
+              </Link>
+
               <Link
                 to="/dashboard"
-                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-transform hover:scale-105"
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-transform hover:scale-105"
                 style={{ background: 'var(--gradient-gold, linear-gradient(135deg, #D8AA5B, #E8C982))', color: '#0B2920' }}
               >
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
+                <LayoutDashboard className="h-3.5 w-3.5" />
+                <span>Dashboard</span>
               </Link>
-              <button
-                onClick={signOut}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium transition cursor-pointer"
-                style={{ color: 'oklch(0.97 0.012 90 / 0.9)' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'oklch(0.97 0.012 90)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'oklch(0.97 0.012 90 / 0.9)')}
-              >
-                <LogOut className="h-4 w-4" />
-                Sign out
-              </button>
+
+              {/* User Avatar & Dropdown Menu */}
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen((v) => !v)}
+                  className="inline-flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full border transition cursor-pointer hover:bg-white/10"
+                  style={{ borderColor: 'oklch(0.97 0.012 90 / 0.25)' }}
+                  aria-label="User account menu"
+                >
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-forest-900 font-bold text-xs shrink-0">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{(user.display_name || user.username || 'R')[0].toUpperCase()}</span>
+                    )}
+                  </div>
+                  <span className="text-xs font-medium max-w-[110px] truncate" style={{ color: 'oklch(0.97 0.012 90)' }}>
+                    {user.display_name || user.username}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform opacity-70 ${userMenuOpen ? 'rotate-180' : ''}`}
+                    style={{ color: 'oklch(0.97 0.012 90)' }}
+                  />
+                </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-cream-200 py-1.5 z-50 animate-in fade-in slide-in-from-top-2 text-left">
+                    <div className="px-4 py-2.5 border-b border-cream-100">
+                      <p className="text-xs font-bold text-ink truncate">{user.display_name || user.username}</p>
+                      <p className="text-[11px] text-ink-muted truncate">{user.email}</p>
+                      <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cream-100 text-forest-800">
+                        {user.role === 'admin' ? 'Administrator' : 'Reader'}
+                      </span>
+                    </div>
+
+                    <div className="py-1">
+                      <Link
+                        to="/profile"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-ink hover:bg-cream-50 transition-colors"
+                      >
+                        <User className="w-3.5 h-3.5 text-forest-600" />
+                        <span>My Profile</span>
+                      </Link>
+
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-ink hover:bg-cream-50 transition-colors"
+                      >
+                        <LayoutDashboard className="w-3.5 h-3.5 text-forest-600" />
+                        <span>Reading Dashboard</span>
+                      </Link>
+
+                      <Link
+                        to="/upload"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-ink hover:bg-cream-50 transition-colors"
+                      >
+                        <Upload className="w-3.5 h-3.5 text-forest-600" />
+                        <span>Upload Material</span>
+                      </Link>
+
+                      {user.role === 'admin' && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-gold-700 hover:bg-gold-50 transition-colors"
+                        >
+                          <Shield className="w-3.5 h-3.5 text-gold-600" />
+                          <span>Admin Portal</span>
+                        </Link>
+                      )}
+                    </div>
+
+                    <div className="border-t border-cream-100 pt-1">
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          signOut();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 transition-colors text-left cursor-pointer"
+                      >
+                        <LogOut className="w-3.5 h-3.5 text-rose-600" />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>
@@ -182,20 +284,31 @@ export default function Navbar({ solid = false }) {
         >
           {/* User Info Section */}
           {user && (
-            <div className="pt-4 pb-6 border-b mb-4" style={{ borderColor: 'oklch(0.97 0.012 90 / 0.10)' }}>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-forest-900 font-bold text-lg">
-                  {user.display_name?.[0]?.toUpperCase() || user.username?.[0]?.toUpperCase()}
+            <div className="pt-4 pb-5 border-b mb-4" style={{ borderColor: 'oklch(0.97 0.012 90 / 0.10)' }}>
+              <Link
+                to="/profile"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-between p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-forest-900 font-bold text-lg shrink-0">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{(user.display_name || user.username || 'R')[0].toUpperCase()}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-base font-semibold truncate" style={{ color: 'oklch(0.97 0.012 90)' }}>
+                      {user.display_name || user.username}
+                    </p>
+                    <p className="text-xs truncate" style={{ color: 'oklch(0.97 0.012 90 / 0.6)' }}>
+                      {user.email}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-base font-semibold" style={{ color: 'oklch(0.97 0.012 90)' }}>
-                    {user.display_name || user.username}
-                  </p>
-                  <p className="text-xs" style={{ color: 'oklch(0.97 0.012 90 / 0.6)' }}>
-                    {user.email}
-                  </p>
-                </div>
-              </div>
+                <span className="text-xs text-gold-400 font-semibold shrink-0">Profile →</span>
+              </Link>
             </div>
           )}
 
@@ -238,6 +351,24 @@ export default function Navbar({ solid = false }) {
                   </Link>
                 )}
                 <Link
+                  to="/profile"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl border text-sm font-semibold transition-all hover:bg-cream-50/5"
+                  style={{ borderColor: 'oklch(0.97 0.012 90 / 0.20)', color: 'oklch(0.97 0.012 90)' }}
+                >
+                  <User className="w-4 h-4 text-gold-400" />
+                  My Profile
+                </Link>
+                <Link
+                  to="/upload"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl border text-sm font-semibold transition-all hover:bg-cream-50/5"
+                  style={{ borderColor: 'oklch(0.97 0.012 90 / 0.20)', color: 'var(--gold, #D8AA5B)' }}
+                >
+                  <Upload className="w-4 h-4" />
+                  Upload Material
+                </Link>
+                <Link
                   to="/dashboard"
                   onClick={() => setOpen(false)}
                   className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-sm font-semibold transition-transform active:scale-95"
@@ -248,11 +379,10 @@ export default function Navbar({ solid = false }) {
                 </Link>
                 <button
                   onClick={signOut}
-                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl border text-sm font-medium transition-all hover:bg-cream-50/5 cursor-pointer"
-                  style={{ borderColor: 'oklch(0.97 0.012 90 / 0.20)', color: 'oklch(0.97 0.012 90)' }}
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl border border-rose-500/40 text-rose-300 font-semibold bg-rose-500/10 hover:bg-rose-500/20 transition-all cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
-                  Sign out
+                  Log Out
                 </button>
               </>
             ) : (

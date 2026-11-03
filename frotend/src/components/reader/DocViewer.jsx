@@ -16,6 +16,8 @@ export default function DocViewer({
   onPositionChange,
   fontSize = 18,
   onAddBookmark,
+  onDownload,
+  hasAccess = false,
 }) {
   const [htmlContent, setHtmlContent] = useState('');
   const [loading, setLoading] = useState(() => Boolean(bookId));
@@ -129,16 +131,13 @@ export default function DocViewer({
         <AlertTriangle className="w-10 h-10 text-red-500 mx-auto mb-3" />
         <h3 className="font-semibold text-lg text-ink mb-2">Unsupported Legacy Format</h3>
         <p className="text-sm text-ink-light mb-6">{error}</p>
-        {fileUrl && (
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm"
-          >
-            Download Word Document
-          </a>
-        )}
+        <button
+          onClick={onDownload}
+          type="button"
+          className="btn btn-primary inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm cursor-pointer"
+        >
+          {hasAccess ? 'Download Word Document' : 'Download via Chapa (50 ETB)'}
+        </button>
       </div>
     );
   }

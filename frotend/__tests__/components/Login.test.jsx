@@ -5,29 +5,28 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter, MemoryRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import Login from '../../src/pages/Login';
-import { AuthProvider } from '../../src/context/AuthContext';
 
-// Mock the AuthContext
-vi.mock('../../src/context/AuthContext', async () => {
-  const actual = await vi.importActual('../../src/context/AuthContext');
-  return {
-    ...actual,
-    useAuth: vi.fn(),
-  };
-});
-
-// Mock navigation
+// Mock navigation and location
 const mockNavigate = vi.fn();
+const mockLocation = { state: null };
+
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useLocation: () => ({ state: null }),
+    useLocation: () => mockLocation,
   };
 });
+
+// Mock AuthContext
+const mockUseAuth = vi.fn();
+vi.mock('../../src/context/AuthContext', () => ({
+  useAuth: () => mockUseAuth(),
+  AuthProvider: ({ children }) => children,
+}));
 
 // Mock assets
 vi.mock('../../src/assets/login.jpg', () => ({
@@ -39,9 +38,9 @@ describe('Login Component', () => {
 
   beforeEach(() => {
     mockNavigate.mockClear();
+    mockLocation.state = null;
     mockLogin = vi.fn();
-    const { useAuth } = require('../../src/context/AuthContext');
-    useAuth.mockReturnValue({
+    mockUseAuth.mockReturnValue({
       user: null,
       loading: false,
       login: mockLogin,
@@ -53,9 +52,7 @@ describe('Login Component', () => {
   const renderLogin = () => {
     return render(
       <BrowserRouter>
-        <AuthProvider>
-          <Login />
-        </AuthProvider>
+        <Login />
       </BrowserRouter>
     );
   };
@@ -65,17 +62,17 @@ describe('Login Component', () => {
       renderLogin();
 
       expect(screen.getByText('Welcome back')).toBeInTheDocument();
-      expect(screen.getByText('Log in to continue your reading streak.')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument();
+      expect(screen.getByText(/sign in to continue your reading journey/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('reader@example.com')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
     });
 
     it('should render register link', () => {
       renderLogin();
 
-      expect(screen.getByText('New to ReadRise?')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: /sign up/i })).toBeInTheDocument();
+      expect(screen.getByText(/new to readrise\?/i)).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /create an account/i })).toBeInTheDocument();
     });
 
     it('should not show error initially', () => {
@@ -89,7 +86,7 @@ describe('Login Component', () => {
     it('should update email input on change', () => {
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
 
       expect(emailInput.value).toBe('test@example.com');
@@ -98,7 +95,7 @@ describe('Login Component', () => {
     it('should update password input on change', () => {
       renderLogin();
 
-      const passwordInput = screen.getByPlaceholderText('Password');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
       expect(passwordInput.value).toBe('password123');
@@ -107,9 +104,9 @@ describe('Login Component', () => {
     it('should call login with trimmed email and password on submit', async () => {
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
-      const submitButton = screen.getByRole('button', { name: /log in/i });
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
 
       fireEvent.change(emailInput, { target: { value: '  test@example.com  ' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -124,9 +121,9 @@ describe('Login Component', () => {
       mockLogin.mockImplementation(() => new Promise(() => {})); // Never resolves
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
-      const submitButton = screen.getByRole('button', { name: /log in/i });
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
 
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -134,7 +131,7 @@ describe('Login Component', () => {
 
       await waitFor(() => {
         expect(submitButton).toBeDisabled();
-        expect(submitButton).toHaveTextContent('Please wait…');
+        expect(submitButton).toHaveTextContent(/verifying credentials/i);
       });
     });
 
@@ -142,9 +139,9 @@ describe('Login Component', () => {
       mockLogin.mockResolvedValue();
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
-      const submitButton = screen.getByRole('button', { name: /log in/i });
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
 
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -156,15 +153,13 @@ describe('Login Component', () => {
     });
 
     it('should navigate to from location if provided', async () => {
-      const { useLocation } = require('react-router-dom');
-      useLocation.mockReturnValue({ state: { from: '/books' } });
-
+      mockLocation.state = { from: '/books' };
       mockLogin.mockResolvedValue();
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
-      const submitButton = screen.getByRole('button', { name: /log in/i });
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
 
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -185,9 +180,9 @@ describe('Login Component', () => {
 
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
-      const submitButton = screen.getByRole('button', { name: /log in/i });
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
 
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
@@ -203,16 +198,16 @@ describe('Login Component', () => {
 
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
-      const submitButton = screen.getByRole('button', { name: /log in/i });
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
 
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Login failed')).toBeInTheDocument();
+        expect(screen.getByText('Invalid email or password. Please try again.')).toBeInTheDocument();
       });
     });
 
@@ -223,9 +218,9 @@ describe('Login Component', () => {
 
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
-      const submitButton = screen.getByRole('button', { name: /log in/i });
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
 
       // First attempt - should fail
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
@@ -250,28 +245,28 @@ describe('Login Component', () => {
     it('should require email field', () => {
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
       expect(emailInput).toHaveAttribute('required');
     });
 
     it('should require password field', () => {
       renderLogin();
 
-      const passwordInput = screen.getByPlaceholderText('Password');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
       expect(passwordInput).toHaveAttribute('required');
     });
 
     it('should enforce minimum password length', () => {
       renderLogin();
 
-      const passwordInput = screen.getByPlaceholderText('Password');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
       expect(passwordInput).toHaveAttribute('minLength', '6');
     });
 
     it('should validate email format', () => {
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
       expect(emailInput).toHaveAttribute('type', 'email');
     });
   });
@@ -280,8 +275,8 @@ describe('Login Component', () => {
     it('should have proper form labels through placeholders', () => {
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
 
       expect(emailInput).toBeInTheDocument();
       expect(passwordInput).toBeInTheDocument();
@@ -291,9 +286,9 @@ describe('Login Component', () => {
       mockLogin.mockImplementation(() => new Promise(() => {}));
       renderLogin();
 
-      const submitButton = screen.getByRole('button', { name: /log in/i });
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
 
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -304,16 +299,16 @@ describe('Login Component', () => {
       });
     });
 
-    it('should have error message in accessible container', async () => {
+    it('should have error message in visible error container', async () => {
       mockLogin.mockRejectedValue({
         response: { data: { error: 'Error message' } },
       });
 
       renderLogin();
 
-      const emailInput = screen.getByPlaceholderText('Email');
-      const passwordInput = screen.getByPlaceholderText('Password');
-      const submitButton = screen.getByRole('button', { name: /log in/i });
+      const emailInput = screen.getByPlaceholderText('reader@example.com');
+      const passwordInput = screen.getByPlaceholderText('••••••••');
+      const submitButton = screen.getByRole('button', { name: /sign in/i });
 
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'password123' } });

@@ -515,6 +515,11 @@
 /* =========================================================
    READER THEMES
    ========================================================= */
+.reader-wps-green {
+  background: #e7f3e8;
+  color: #1a3c27;
+}
+
 .reader-sepia {
   background: oklch(0.92 0.04 60);
   color: oklch(0.35 0.05 55);

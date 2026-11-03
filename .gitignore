@@ -1,24 +1,53 @@
-﻿# Dependencies
+# Dependencies
 node_modules/
 
 # Local environment files
 .env
 .env.*
 !.env.example
+*.local
 
 # Build and test output
 dist/
+dist-ssr/
 coverage/
+playwright-report/
+test-results/
+.last-run.json
 
 # Logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
+
+# Dynamic user uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+!backend/uploads/sample-*
+uploads/*
+!uploads/.gitkeep
+!uploads/sample-*
 
 # OS files
 .DS_Store
 Thumbs.db
 
+# IDE and Editor files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
 # Qodo agent files and generated workflows
 .qodo/
+
+# Backup git directory
+backend_git_backup/

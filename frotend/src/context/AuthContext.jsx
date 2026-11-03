@@ -11,10 +11,16 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem('readrise.token');
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     api.get('/auth/me')
       .then(({ data }) => setUser(data.user))
-      .catch(() => localStorage.removeItem('readrise.token'))
+      .catch(() => {
+        localStorage.removeItem('readrise.token');
+        setUser(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -22,12 +28,21 @@ export function AuthProvider({ children }) {
     const { data } = await api.post('/auth/login', { email, password });
     localStorage.setItem('readrise.token', data.token);
     setUser(data.user);
+    return data.user;
   };
 
   const register = async (payload) => {
     const { data } = await api.post('/auth/register', payload);
     localStorage.setItem('readrise.token', data.token);
     setUser(data.user);
+    return data.user;
+  };
+
+  const loginWithGoogle = async (googlePayload) => {
+    const { data } = await api.post('/auth/google', googlePayload);
+    localStorage.setItem('readrise.token', data.token);
+    setUser(data.user);
+    return data.user;
   };
 
   const logout = () => {
@@ -35,13 +50,16 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateUser = (updatedUser) => {
+    setUser((prev) => ({ ...prev, ...updatedUser }));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, loginWithGoogle, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// The hook is intentionally colocated with its provider for a stable public API.
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

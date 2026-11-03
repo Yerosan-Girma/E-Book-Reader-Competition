@@ -1,13 +1,88 @@
 export const categories = [
+  'Art & Culture',
+  'Economics',
+  'Education',
   'Spiritual',
   'Psychology',
-  'Education',
-  'Fiction',
 ];
 
 // Sample books with live backend database IDs and offline fallback data
-// These demonstrate the category-based gradient system
+// Fully reflects the curated library: Image Album, PDF Documents, Word DOCX, and Chapter eBooks.
 export const books = [
+  {
+    id: 28,
+    slug: 'visual-ethiopia-architecture',
+    title: 'Visual Ethiopia & Architecture (Image Album)',
+    author: 'Cultural Heritage Archive',
+    category: 'Art & Culture',
+    description: 'A curated visual collection of Ethiopian architectural marvels, manuscripts, landscape photography, and heritage art in high resolution image format.',
+    pages: 6,
+    file_type: 'image/jpeg',
+    file_url: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=1200',
+    cover_url: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=600',
+    chapters: [
+      {
+        id: 54,
+        chapter_number: 1,
+        title: 'Plate 1: Historic Architecture & Highlands',
+        content: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=1400',
+      },
+      {
+        id: 55,
+        chapter_number: 2,
+        title: 'Plate 2: Ancient Manuscript & Script',
+        content: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=1400',
+      },
+      {
+        id: 56,
+        chapter_number: 3,
+        title: 'Plate 3: Monolithic Rock Churches',
+        content: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=1400',
+      },
+      {
+        id: 57,
+        chapter_number: 4,
+        title: 'Plate 4: The Great Rift Valley Landscapes',
+        content: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=1400',
+      },
+      {
+        id: 58,
+        chapter_number: 5,
+        title: 'Plate 5: Royal Castles of Gondar',
+        content: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=1400',
+      },
+      {
+        id: 59,
+        chapter_number: 6,
+        title: 'Plate 6: Traditional Art & Frescoes',
+        content: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&q=80&w=1400',
+      },
+    ],
+  },
+  {
+    id: 27,
+    slug: 'economics',
+    title: 'Economics',
+    author: 'instructor',
+    category: 'Economics',
+    description: 'Foundations of economic thought, market dynamics, resource allocation, and macro/micro-economic principles.',
+    pages: 45,
+    file_type: 'application/pdf',
+    file_url: 'uploads/book-1792809130890-494732421.pdf',
+    chapters: [],
+  },
+  {
+    id: 24,
+    slug: 'modern-digital-reading',
+    title: 'Modern Digital Reading (Word DOCX)',
+    author: 'ReadRise Research Collective',
+    category: 'Education',
+    description: 'An authoritative study on digital reading ergonomics, typography, cognitive retention across electronic devices, and user interface paradigms.',
+    pages: 14,
+    file_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    file_url: 'uploads/sample-research.docx',
+    chapters: [],
+  },
   {
     id: 21,
     slug: 'doctrine-martin-luther',

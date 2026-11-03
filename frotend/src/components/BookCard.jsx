@@ -1,126 +1,159 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Bookmark, BookmarkCheck, Clock, FileText, ArrowRight, HardDrive } from 'lucide-react';
+import { toast } from 'sonner';
+import { BookCover } from './ui/BookCover';
+import { detectMaterialFormat, formatFileSize, estimateReadingTime, getMaterialLengthLabel } from '../lib/materialUtils';
 
-// Color gradients based on categories - this will work for any book
-const categoryGradients = {
-  'Spiritual': 'from-purple-500 via-purple-600 to-purple-800',
-  'Psychology': 'from-blue-500 via-blue-600 to-blue-800',
-  'Education': 'from-forest-500 via-forest-600 to-forest-800',
-  'Fiction': 'from-rose-500 via-rose-600 to-rose-800',
-  'default': 'from-gold-400 via-gold-500 to-gold-700',
-};
+export default function BookCard({ book, index = 0, onBookmarkToggle, isBookmarked = false }) {
+  const [saved, setSaved] = useState(isBookmarked);
+  const navigate = useNavigate();
 
-// Fallback gradients for books without category
-const fallbackGradients = [
-  'from-forest-500 via-forest-600 to-forest-800',
-  'from-gold-400 via-gold-500 to-gold-700',
-  'from-purple-500 via-purple-600 to-purple-800',
-  'from-blue-500 via-blue-600 to-blue-800',
-  'from-rose-500 via-rose-600 to-rose-800',
-];
+  if (!book) return null;
 
-export default function BookCard({ book, index = 0 }) {
-  // Get category from book data
-  const categoryName = book.category || (Array.isArray(book.categories) ? book.categories[0] : null);
+  const format = detectMaterialFormat(book);
+  const lengthLabel = getMaterialLengthLabel(book);
+  const fileSizeLabel = formatFileSize(book.file_size);
+  const readTimeLabel = estimateReadingTime(book);
+  const categoryName =
+    book.category ||
+    (Array.isArray(book.categories) && book.categories.length > 0 ? book.categories[0] : null) ||
+    null;
 
-  // Assign gradient based on category or fallback to ID-based gradient
-  const coverBg = categoryGradients[categoryName] || fallbackGradients[book.id % fallbackGradients.length];
+  const toggleBookmark = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const nextSaved = !saved;
+    setSaved(nextSaved);
+
+    if (onBookmarkToggle) {
+      onBookmarkToggle(book.id, nextSaved);
+    } else {
+      if (nextSaved) {
+        toast.success(`Saved "${book.title}" to reading list`, {
+          description: `${format.label} document saved.`,
+        });
+      } else {
+        toast(`Removed "${book.title}" from reading list`);
+      }
+    }
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
+    <motion.article
+      data-testid="book-card"
+      initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.4, delay: index * 0.05, ease: [0.2, 0.8, 0.2, 1] }}
+      viewport={{ once: true, margin: '-20px' }}
+      transition={{ duration: 0.4, delay: Math.min(0.25, (index % 6) * 0.05), ease: [0.2, 0.8, 0.2, 1] }}
+      className="group flex flex-col h-full bg-white/70 hover:bg-white rounded-2xl p-3 sm:p-3.5 border border-cream-200/80 hover:border-forest-300/60 shadow-xs hover:shadow-card transition-all duration-300"
     >
-      <Link
-        to={`/read/${book.id}`}
-        className="group block touch-manipulation"
-        aria-label={`Start reading ${book.title} by ${book.author}`}
-      >
-        {/* Compact Book Cover */}
-        <div className="relative aspect-[2/3] w-full rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 mb-3">
-          {/* Gradient background */}
-          <div
-            className={`absolute inset-0 bg-gradient-to-br ${coverBg} transition-all duration-300 group-hover:scale-105`}
-          />
-
-          {/* Cover image if available */}
-          {book.cover_url && (
-            <>
-              <img
-                src={book.cover_url}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            </>
-          )}
-
-          {/* Content overlay */}
-          <div className="absolute inset-0 flex flex-col justify-between p-3 sm:p-4">
-            {/* Top: Category badge */}
-            {categoryName && (
-              <div className="self-start">
-                <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-cream-50/90 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full">
-                  {categoryName}
-                </span>
-              </div>
-            )}
-
-            {/* Bottom: Title */}
-            <div>
-              <p className="font-display text-xs sm:text-sm text-cream-50 font-semibold leading-tight line-clamp-2 drop-shadow-sm">
-                {book.title}
-              </p>
-              <p className="text-[10px] sm:text-xs text-cream-50/70 mt-0.5 truncate">
-                {book.author}
-              </p>
-            </div>
+      {/* ── Document / Book Cover Section ── */}
+      <div className="relative mb-3">
+        <Link
+          to={`/read/${book.id}`}
+          className="block relative rounded-xl overflow-hidden cursor-pointer"
+          aria-label={`Read ${book.title}`}
+        >
+          {/* Cover Component */}
+          <div className="transition-transform duration-300 group-hover:scale-[1.02]">
+            <BookCover book={book} tilt={false} showBadge={false} />
           </div>
 
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-forest-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-        </div>
+          {/* Format Pill (top-left) */}
+          <div className="absolute top-2.5 left-2.5 z-20">
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-bold tracking-wider uppercase border backdrop-blur-md shadow-xs ${format.badgeClass}`}
+            >
+              <FileText className="w-3 h-3" />
+              {format.label}
+            </span>
+          </div>
 
-        {/* Book info below */}
+          {/* Hover Action Overlay: "Read Online" button */}
+          <div className="absolute inset-0 z-30 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3 pointer-events-none">
+            <span className="btn btn-primary text-xs py-2 px-3 w-full flex items-center justify-center gap-1.5 shadow-md">
+              <span>Read Now</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </div>
+        </Link>
+
+        {/* Quick Bookmark Action (top-right) */}
+        <button
+          onClick={toggleBookmark}
+          aria-label={saved ? 'Remove bookmark' : 'Bookmark this material'}
+          className={`absolute top-2.5 right-2.5 z-30 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm ${
+            saved
+              ? 'bg-gold-500 text-cream-50 scale-105'
+              : 'bg-white/90 text-ink-muted hover:text-ink hover:bg-white'
+          }`}
+        >
+          {saved ? <BookmarkCheck className="w-4 h-4 fill-current" /> : <Bookmark className="w-4 h-4" />}
+        </button>
+      </div>
+
+      {/* ── Metadata & Details Section ── */}
+      <div className="flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="font-display text-sm sm:text-base text-ink font-medium leading-snug line-clamp-2 group-hover:text-forest-400 transition-colors duration-200">
-            {book.title}
-          </h3>
-          <p className="text-xs text-ink-muted mt-1 truncate">
-            {book.author}
-          </p>
-
-          {/* Tags */}
-          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-            {book.file_type && (
-              <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full bg-cream-200/80 text-forest-700 border border-cream-300">
-                {book.file_type.includes('pdf')
-                  ? 'PDF'
-                  : book.file_type.includes('epub')
-                  ? 'EPUB'
-                  : book.file_type.includes('word') || book.file_type.includes('docx')
-                  ? 'DOCX'
-                  : book.file_type.includes('rtf')
-                  ? 'RTF'
-                  : book.file_type.includes('text')
-                  ? 'TXT'
-                  : 'FILE'}
+          {/* Category & Length Meta Row */}
+          <div className="flex items-center justify-between gap-1 mb-1.5 flex-wrap">
+            {categoryName ? (
+              <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-forest-500 bg-forest-50 border border-forest-100 px-2 py-0.5 rounded-full truncate max-w-[65%]">
+                {categoryName}
+              </span>
+            ) : (
+              <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+                {format.description}
               </span>
             )}
-            {book.language && (
-              <span className="text-[9px] sm:text-[10px] text-ink-muted flex items-center gap-0.5 font-medium">
-                <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gold-500" />
-                {book.language}
-              </span>
+            <span className="text-[10px] text-ink-muted flex items-center gap-0.5">
+              <Clock className="w-3 h-3 text-gold-500" />
+              {readTimeLabel}
+            </span>
+          </div>
+
+          {/* Book Title */}
+          <Link to={`/books/${book.id}`} className="block group-hover/title">
+            <h3
+              className="font-display text-sm sm:text-base font-semibold text-ink leading-snug line-clamp-2 group-hover:text-forest-400 transition-colors"
+              title={book.title}
+            >
+              {book.title}
+            </h3>
+          </Link>
+
+          {/* Author */}
+          <p className="text-xs text-ink-light mt-1 truncate">
+            by <span className="font-medium text-ink">{book.author || 'Unknown'}</span>
+          </p>
+        </div>
+
+        {/* ── Bottom Specs & Quick Actions Bar ── */}
+        <div className="mt-3 pt-2.5 border-t border-cream-200/80 flex items-center justify-between gap-2 text-[11px] text-ink-muted">
+          <div className="flex items-center gap-2 truncate">
+            <span className="font-medium truncate">{lengthLabel}</span>
+            {fileSizeLabel && (
+              <>
+                <span className="text-cream-300">•</span>
+                <span className="truncate flex items-center gap-0.5">
+                  <HardDrive className="w-3 h-3 text-ink-muted/80" />
+                  {fileSizeLabel}
+                </span>
+              </>
             )}
           </div>
+
+          {/* Details Link */}
+          <Link
+            to={`/books/${book.id}`}
+            className="shrink-0 text-[11px] font-semibold text-forest-400 hover:text-forest-600 transition-colors flex items-center gap-0.5"
+          >
+            <span>Overview</span>
+          </Link>
         </div>
-      </Link>
-    </motion.div>
+      </div>
+    </motion.article>
   );
 }

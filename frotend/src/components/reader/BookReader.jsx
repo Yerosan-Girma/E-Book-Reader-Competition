@@ -8,6 +8,7 @@ import {
   Sun,
   Moon,
   Coffee,
+  Eye,
   CheckCircle2,
   Maximize2,
   Minimize2,
@@ -15,9 +16,13 @@ import {
   Trash2,
   ChevronDown,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import api from '../../api/client';
+import ChapaPaymentModal from '../payment/ChapaPaymentModal';
+import { checkBookAccess, downloadSecureBook } from '../../lib/downloadService';
 import PDFViewer from './PDFViewer';
 import DocxViewer from './DocxViewer';
+import ImageViewer from './ImageViewer';
 import EPUBViewer from './EPUBViewer';
 import TextViewer from './TextViewer';
 import RTFViewer from './RTFViewer';
@@ -25,7 +30,7 @@ import DocViewer from './DocViewer';
 import ChapterViewer from './ChapterViewer';
 
 const FONT_SIZES = [15, 16, 17, 18, 20, 22, 24];
-const THEMES = ['light', 'sepia', 'dark'];
+const THEMES = ['light', 'wps-green', 'sepia', 'dark'];
 
 export default function BookReader({
   book,
@@ -35,6 +40,8 @@ export default function BookReader({
   currentChapter,
   status,
   seconds,
+  sessionSeconds,
+  initialPosition,
   onStartSession,
   onPauseSession,
   onResumeSession,
@@ -45,13 +52,58 @@ export default function BookReader({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showBookmarksMenu, setShowBookmarksMenu] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
-  const [savedPosition, setSavedPosition] = useState(null);
+  const [savedPosition, setSavedPosition] = useState(() => initialPosition || null);
   const [currentPercent, setCurrentPercent] = useState(0);
-  const [currentPosition, setCurrentPosition] = useState(null);
+  const [currentPosition, setCurrentPosition] = useState(() => initialPosition || null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [activeViewMode, setActiveViewMode] = useState('auto'); // 'file' | 'chapters' | 'auto'
 
+  const [hasAccess, setHasAccess] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => {
+    if (book?.id) {
+      checkBookAccess(book.id)
+        .then((data) => setHasAccess(Boolean(data.hasAccess)))
+        .catch(() => setHasAccess(false));
+    }
+  }, [book?.id]);
+
+  const handleSecureDownload = async () => {
+    if (!book?.id) return;
+    if (!hasAccess) {
+      setIsPaymentModalOpen(true);
+      return;
+    }
+    try {
+      setDownloading(true);
+      await downloadSecureBook(book.id, book.title);
+      toast.success(`"${book.title}" downloaded!`);
+    } catch (err) {
+      if (err.paymentRequired) {
+        setHasAccess(false);
+        setIsPaymentModalOpen(true);
+      } else {
+        toast.error(err.message || 'Download failed');
+      }
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (initialPosition) {
+      setSavedPosition(initialPosition);
+      setCurrentPosition(initialPosition);
+    }
+  }, [initialPosition]);
+
   const saveTimerRef = useRef(null);
+  const sessionSecondsRef = useRef(sessionSeconds || 0);
+  const secondsRef = useRef(seconds || 0);
+  sessionSecondsRef.current = sessionSeconds || 0;
+  secondsRef.current = seconds || 0;
 
   // Determine detected format
   const detectFormat = () => {
@@ -68,6 +120,16 @@ export default function BookReader({
       return 'docx';
     }
     if (fileType.includes('msword') || fileUrl.endsWith('.doc')) return 'doc';
+    if (
+      fileType.includes('image') ||
+      fileType.includes('jpeg') ||
+      fileType.includes('png') ||
+      fileType.includes('webp') ||
+      fileUrl.match(/\.(jpeg|jpg|png|webp|gif)$/i) ||
+      (chapters && chapters.length > 0 && chapters.some((c) => c.content?.startsWith('http') || c.content?.includes('uploads/')))
+    ) {
+      return 'image';
+    }
     if (fileType.includes('epub') || fileUrl.endsWith('.epub')) return 'epub';
     if (fileType.includes('rtf') || fileUrl.endsWith('.rtf')) return 'rtf';
     if (fileType.includes('text') || fileUrl.endsWith('.txt')) return 'txt';
@@ -88,11 +150,12 @@ export default function BookReader({
       ? detectedFormat
       : 'chapter';
 
-  // Construct reliable file URL
+  // Construct reliable authenticated file URL
   const getFileUrl = () => {
     if (!book?.id) return null;
     const base = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    return `${base}/books/${book.id}/file`;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('readrise.token') : null;
+    return token ? `${base}/books/${book.id}/file?token=${encodeURIComponent(token)}` : `${base}/books/${book.id}/file`;
   };
 
   const fileUrl = getFileUrl();
@@ -141,6 +204,7 @@ export default function BookReader({
             scrollPercent: Math.min(100, Math.max(0, numPct)),
             isCompleted: willComplete,
             bookmarks,
+            seconds: sessionSecondsRef.current || secondsRef.current,
           })
           .then(() => {
             if (willComplete && !isCompleted) {
@@ -182,6 +246,7 @@ export default function BookReader({
           position: String(currentPosition || ''),
           scrollPercent: currentPercent,
           bookmarks: updated,
+          seconds: sessionSecondsRef.current || secondsRef.current,
         })
         .catch(() => {});
     }
@@ -199,6 +264,7 @@ export default function BookReader({
           position: String(currentPosition || ''),
           scrollPercent: currentPercent,
           bookmarks: updated,
+          seconds: sessionSecondsRef.current || secondsRef.current,
         })
         .catch(() => {});
     }
@@ -224,11 +290,21 @@ export default function BookReader({
     return () => document.removeEventListener('fullscreenchange', onFsChange);
   }, []);
 
-  const mmss = (s) =>
-    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  const mmss = (s) => {
+    const total = Math.max(0, Number(s) || 0);
+    const hrs = Math.floor(total / 3600);
+    const mins = Math.floor((total % 3600) / 60);
+    const rem = total % 60;
+    if (hrs > 0) {
+      return `${hrs}h ${String(mins).padStart(2, '0')}m`;
+    }
+    return `${String(mins).padStart(2, '0')}:${String(rem).padStart(2, '0')}`;
+  };
 
   const themeClasses =
-    theme === 'sepia'
+    theme === 'wps-green'
+      ? 'reader-wps-green bg-[#e7f3e8] text-[#1a3c27]'
+      : theme === 'sepia'
       ? 'reader-sepia'
       : theme === 'dark'
       ? 'reader-dark'
@@ -238,6 +314,7 @@ export default function BookReader({
     pdf: 'bg-red-100 text-red-700 border-red-200',
     docx: 'bg-blue-100 text-blue-700 border-blue-200',
     doc: 'bg-sky-100 text-sky-700 border-sky-200',
+    image: 'bg-purple-100 text-purple-700 border-purple-200',
     epub: 'bg-purple-100 text-purple-700 border-purple-200',
     rtf: 'bg-amber-100 text-amber-700 border-amber-200',
     txt: 'bg-emerald-100 text-emerald-700 border-emerald-200',
@@ -248,7 +325,7 @@ export default function BookReader({
     <div className={`min-h-screen transition-colors duration-300 ${themeClasses}`}>
       {/* ─── Top Main Navigation Bar ────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-cream-200 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
+        <div className="w-full px-4 sm:px-6 py-2 flex items-center justify-between gap-3">
           {/* Left: Home & Back & Book Info */}
           <div className="flex items-center gap-2 min-w-0">
             <Link
@@ -388,12 +465,13 @@ export default function BookReader({
             {/* Theme switcher */}
             <div className="inline-flex rounded-full bg-cream-100 border border-cream-200 p-0.5 gap-0.5">
               {THEMES.map((t) => {
-                const Icon = t === 'light' ? Sun : t === 'sepia' ? Coffee : Moon;
+                const Icon = t === 'light' ? Sun : t === 'wps-green' ? Eye : t === 'sepia' ? Coffee : Moon;
+                const label = t === 'wps-green' ? 'WPS Eye Protection (Green)' : `${t} mode`;
                 return (
                   <button
                     key={`t-${t}`}
                     onClick={() => setTheme(t)}
-                    title={`${t} mode`}
+                    title={label}
                     className={`w-7 h-7 rounded-full flex items-center justify-center transition ${
                       theme === t ? 'bg-white shadow-xs text-forest-700' : 'text-ink-muted'
                     }`}
@@ -462,14 +540,35 @@ export default function BookReader({
         {effectiveFormat === 'pdf' ? (
           <PDFViewer
             fileUrl={fileUrl}
+            fileName={book?.title || 'document.pdf'}
             initialPage={savedPosition ? Number(savedPosition) : 1}
             onPageChange={(page, total) => {
               const pct = total > 0 ? (page / total) * 100 : 0;
               handlePositionChange(String(page), pct);
             }}
+            theme={theme}
             bookmarks={bookmarks}
             onAddBookmark={handleAddBookmark}
             onRemoveBookmark={handleRemoveBookmark}
+            onDownload={handleSecureDownload}
+            hasAccess={hasAccess}
+          />
+        ) : effectiveFormat === 'image' ? (
+          <ImageViewer
+            book={book}
+            chapters={chapters}
+            fileUrl={fileUrl}
+            initialPage={savedPosition ? Number(savedPosition) : 1}
+            onPageChange={(page, total) => {
+              const pct = total > 0 ? (page / total) * 100 : 0;
+              handlePositionChange(String(page), pct);
+            }}
+            theme={theme}
+            bookmarks={bookmarks}
+            onAddBookmark={handleAddBookmark}
+            onRemoveBookmark={handleRemoveBookmark}
+            onDownload={handleSecureDownload}
+            hasAccess={hasAccess}
           />
         ) : effectiveFormat === 'docx' ? (
           <DocxViewer
@@ -481,6 +580,8 @@ export default function BookReader({
             bookmarks={bookmarks}
             onAddBookmark={handleAddBookmark}
             onRemoveBookmark={handleRemoveBookmark}
+            onDownload={handleSecureDownload}
+            hasAccess={hasAccess}
           />
         ) : effectiveFormat === 'doc' ? (
           <DocViewer
@@ -493,6 +594,8 @@ export default function BookReader({
             bookmarks={bookmarks}
             onAddBookmark={handleAddBookmark}
             onRemoveBookmark={handleRemoveBookmark}
+            onDownload={handleSecureDownload}
+            hasAccess={hasAccess}
           />
         ) : effectiveFormat === 'epub' ? (
           <EPUBViewer
@@ -504,6 +607,8 @@ export default function BookReader({
             bookmarks={bookmarks}
             onAddBookmark={handleAddBookmark}
             onRemoveBookmark={handleRemoveBookmark}
+            onDownload={handleSecureDownload}
+            hasAccess={hasAccess}
           />
         ) : effectiveFormat === 'rtf' ? (
           <RTFViewer
@@ -515,6 +620,8 @@ export default function BookReader({
             bookmarks={bookmarks}
             onAddBookmark={handleAddBookmark}
             onRemoveBookmark={handleRemoveBookmark}
+            onDownload={handleSecureDownload}
+            hasAccess={hasAccess}
           />
         ) : effectiveFormat === 'txt' ? (
           <TextViewer
@@ -526,6 +633,8 @@ export default function BookReader({
             bookmarks={bookmarks}
             onAddBookmark={handleAddBookmark}
             onRemoveBookmark={handleRemoveBookmark}
+            onDownload={handleSecureDownload}
+            hasAccess={hasAccess}
           />
         ) : (
           <ChapterViewer
@@ -542,6 +651,19 @@ export default function BookReader({
           />
         )}
       </main>
+
+      {book && (
+        <ChapaPaymentModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          book={book}
+          onSuccess={() => {
+            setHasAccess(true);
+            setIsPaymentModalOpen(false);
+            handleSecureDownload();
+          }}
+        />
+      )}
     </div>
   );
 }

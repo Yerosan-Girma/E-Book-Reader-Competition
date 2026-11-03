@@ -318,6 +318,7 @@ export default function Leaderboard() {
 
                   return (
                     <motion.div
+                      data-testid="leaderboard-row"
                       key={reader.rank}
                       initial={{ opacity: 0, x: -16 }}
                       whileInView={{ opacity: 1, x: 0 }}
