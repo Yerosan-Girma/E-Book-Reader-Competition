@@ -37,3 +37,21 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# AI Agents & Assistants
+.qodo/
+.cursor/
+.cursorrules
+.windsurf/
+.codeium/
+.cline/
+.roo/
+.claude/
+.devin/
+.aider*
+.gemini/
+.copilot/
+.agent/
+.agents/
+agent-prompts/
+*.prompt.md

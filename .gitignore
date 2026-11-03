@@ -46,8 +46,24 @@ Thumbs.db
 *.sln
 *.sw?
 
-# Qodo agent files and generated workflows
+# AI Agents & Assistants
 .qodo/
+.cursor/
+.cursorrules
+.windsurf/
+.codeium/
+.cline/
+.roo/
+.claude/
+.devin/
+.aider*
+.gemini/
+.copilot/
+.agent/
+.agents/
+agent-prompts/
+*.prompt.md
 
-# Backup git directory
+# Local backup directories
 backend_git_backup/
+*_backup/
